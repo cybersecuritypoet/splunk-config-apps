@@ -19,3 +19,11 @@ Applications for configuring Splunk
 |web_ssl                          | SSL configuration for web UI
 |web_ssl_disable                  | Disable web UI SSL
 |web_ssl_enable                   | Enable web UI SSL
+
+
+## How to use
+
+Example usage:
+```
+python3 utils/scripts/compile-apps.py utils/conf-examples/example_1.json ~/splunk-config-apps-out/ apps/
+```
