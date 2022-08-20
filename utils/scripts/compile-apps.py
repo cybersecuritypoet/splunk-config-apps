@@ -58,7 +58,12 @@ def load_data(cfg_file):
 	groups = {}
 	with open(cfg_file) as f:
 		data = f.read()
-		obj = json.loads(data)
+		try:
+			obj = json.loads(data)
+		except json.decoder.JSONDecodeError as ex:
+			print("JSON error: "+ex.msg+" line: "+str(ex.lineno)+" column: "+str(ex.colno)+" (char: "+str(ex.pos)+") ; file: "+cfg_file)
+			print('! Exiting (21).')
+			exit(21)
 		verify_config(obj)
 		for app in obj["globals"]["apps"]:
 			global_apps[app["name"]] = fix_app(app,obj["globals"])
