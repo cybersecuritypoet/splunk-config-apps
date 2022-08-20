@@ -1,0 +1,30 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://github.com/cybersecuritypoet/splunk-config-apps/util/schema/ssl-schema.json",
+    "title": "SSL Config",
+    "description": "Configuration of SSL parameters",
+    "type": "object",
+    "properties" :
+    {
+        "verify_server_cert" : {"type" : "boolean"},
+        "verify_server_name" : {"type" : "boolean"},
+        "key_path" : {"type" : "string"},
+        "cert_path" : {"type" : "string"},
+        "bundle_path" : {"type" : "string"},
+        "trust_chain_path" : {"type" : "string"},
+        "dh_file_path" : {"type" : "string"},
+        "crl_path" : {"type" : "string"},
+        "ssl_versions" : {"type": "array","items": {"type": "string"},"minItems":1 },
+        "cipher_suites" : {"type": "array","items": {"type": "string"},"minItems":1 },
+        "ecdh_curves" : {"type": "array","items": {"type": "string"},"minItems":1 },
+        "client_ssl_versions" : {"type": "array","items": {"type": "string"},"minItems":1 },
+        "client_compression" : {"type" : "boolean"},
+        "splunkd_client_compression" : {"type" : "boolean"},
+        "ssl_compression" : {"type" : "boolean"},
+        "verify_crl" : {"type" : "boolean"}
+    },
+    "$defs":
+    {
+        
+    }
+}

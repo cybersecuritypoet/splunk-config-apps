@@ -1,0 +1,96 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://github.com/cybersecuritypoet/splunk-config-apps/util/schema/apps-config-schema.json",
+    "title": "SSL Config",
+    "description": "Configuration of SSL parameters",
+    "required" : ["globals","groups"],
+    "type": "object",
+    "properties" :
+    {
+        "globals" :
+        {
+            "type": "object",
+            "required" : ["SSL","apps"],
+            "properties":
+            {
+                "SSL" :
+                {
+                    "description": "SSL configuration",
+                    "$ref": "./ssl-schema.json"
+                },
+                "apps" :
+                {
+                    "type" : "array",
+                    "items" :
+                    {
+                        "anyOf":
+                        [
+                            {"$ref" : "./app-indexes-schema.json" },
+                            {"$ref" : "./app-outputs_internal_fwd-schema.json" },
+                            {"$ref" : "./app-server_ssl_san-schema.json" },
+                            {"$ref" : "./app-splunk_httpinput-schema.json" },
+                            {"$ref" : "./app-splunk_httpinput_inputs-schema.json" },
+                            {"$ref" : "#/$defs/app" }
+                        ]
+                    },
+                    "minItems": 0
+                }
+            }
+        },
+        "groups" :
+        {
+            "type" : "array",
+            "items" : { "anyOf":[{"$ref":"#/$defs/group"}]}
+        }
+    },
+    "$defs":
+    {
+        "group" :
+        {
+            "type" : "object",
+            "required" : ["name","apps"],
+            "properties" :
+            {
+                "name" : {"type" : "string"},
+                "path" : {"type" : "string"},
+                "prefix" : {"type" : "string"},
+                "postfix" : {"type" : "string"},
+                "apps" :
+                {
+                    "type" : "array",
+                    "items" :
+                    {
+                        "anyOf":
+                        [
+                            {"$ref" : "./app-indexes-schema.json" },
+                            {"$ref" : "./app-outputs_internal_fwd-schema.json" },
+                            {"$ref" : "./app-server_ssl_san-schema.json" },
+                            {"$ref" : "./app-splunk_httpinput-schema.json" },
+                            {"$ref" : "./app-splunk_httpinput_inputs-schema.json" },
+                            {"$ref" : "#/$defs/app" }
+                        ]
+                    },
+                    "minItems": 0
+                }
+            }
+        },
+        "app" :
+        {
+            "type" : "object",
+            "anyOf":
+            [
+                {"required" : ["template"]},
+                {"required" : ["name"]}
+            ],
+            "properties" :
+            {
+                "template" : {"type" : "string"},
+                "SSL" :
+                {
+                    "description": "SSL configuration",
+                    "$ref": "./ssl-schema.json"
+                }
+            }
+        }
+    }
+}
