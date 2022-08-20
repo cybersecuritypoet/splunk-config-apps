@@ -56,9 +56,11 @@
 				]
 			},
 			{ "template" : "server_ssl", "SSL" : {} },
+			{ "template" : "server_ssl_enable" },
 			{ "template" : "web_disable" },
 			{ "template" : "web_ssl", "SSL" : {} },
-			{ "template" : "web_ssl_enable" }
+			{ "template" : "web_ssl_enable" },
+			{ "template" : "web_hsts_enable" }
 		]
 	},
 	"groups" :
@@ -124,9 +126,40 @@
 							"hot_max_size" : 512,
 							"cold_max_size" : 512
 						},
-						{ "name" : "default_lastchance", "max_size" : 1024, "summary_max_size" : 8, "hot_max_size" : 512, "cold_max_size" : 512 }
+						{ "name" : "default_lastchance", "max_size" : 1024, "summary_max_size" : 8, "hot_max_size" : 512, "cold_max_size" : 512 },
+						{ "name" : "default_example_com", "max_size" : 2048, "summary_max_size" : 8, "hot_max_size" : 1024, "cold_max_size" : 1024 }
+					]
+				},
+				{
+					"template" : "server_indexer_replication_ssl",
+					"SSL" : {},
+					"replication_ports_ssl" :
+					[
+						{
+							"port" : 9100,
+							"SSL" :{ "verify_server_cert" : true }
+						}
+					]
+				},
+				{
+					"template" : "server_indexer_replication_ssl_client_san_check",
+					"replication_ports_ssl" :
+					[
+						{
+							"port" : 9100,
+							"require_client_cert" : true,
+							"peers" :
+							[
+								"idx1.example.com",
+								"idx2.example.com",
+								"idx3.example.com",
+								"idx4.example.com",
+								"idx5.example.com"
+							]
+						}
 					]
 				}
+				
 			]
 		},
 		{
