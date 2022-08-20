@@ -1,0 +1,40 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://github.com/cybersecuritypoet/splunk-config-apps/util/schema/app-splunk_httpinput_inputs-schema.json",
+    "title": "HEC Token Config",
+    "description": "HTTP Event Collector tokens configuration",
+    "type": "object",
+    "properties" :
+    {
+        "skip" : {"type" : "boolean"},
+        "template" : {"type" : "string", "enum":["splunk_httpinput_inputs"]},
+        "enabled" : {"type" : "boolean"},
+        "name" : {"type" : "string"},
+        "prefix" : {"type" : "string"},
+        "postfix" : {"type" : "string"},
+        
+        "tokens" : {"type":"array","items":[{"$ref":"#/$defs/token"}]}
+    },
+    "required" : ["template","peers"],
+    "$defs":
+    {
+        "token" :
+        {
+           
+            "properties":
+            {
+                "name" : {"type" : "string"},
+                "disabled" : {"type" : "boolean"},
+                "token" : {"type" : "string"},
+                "connection_host" : {"type" : "string"},
+                "index" : {"type" : "string"},
+                "indexes" : { "type" : "array", "items" :{"type" : "string"}, "minItems":1},
+                "source" : {"type" : "string"},
+                "sourcetype" : {"type" : "string"},
+                "persistent_q_size" : {"type" : "string"},
+                "q_size" : {"type" : "string"}
+            },
+            "required" : ["name","token"]
+        }
+    }
+}

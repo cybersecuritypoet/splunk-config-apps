@@ -1,0 +1,57 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://github.com/cybersecuritypoet/splunk-config-apps/util/schema/app-indexes-schema.json",
+    "title": "Splunk Indexes config",
+    "description": "Configuration of Indexes",
+    "type": "object",
+    "properties" :
+    {
+        "skip" : {"type" : "boolean"},
+        "template" : {"type" : "string", "enum":["indexes"]},
+        "enabled" : {"type" : "boolean"},
+        "name" : {"type" : "string"},
+        "prefix" : {"type" : "string"},
+        "postfix" : {"type" : "string"},
+        
+        "global_hot_volume_path" : {"type" : "string"},
+        "global_hot_volume_name" : {"type" : "string"},
+        "global_hot_volume_max_size" : {"type" : "integer", "minimum": 0},
+        "global_cold_volume_path" : {"type" : "string"},
+        "global_cold_volume_name" : {"type" : "string"},
+        "global_cold_volume_max_size" : {"type" : "integer", "minimum": 0},
+        "global_summary_volume_path" : {"type" : "string"},
+        "global_summary_volume_name" : {"type" : "string"},
+        "global_summary_volume_max_size" : {"type" : "integer", "minimum": 0},
+        "hot_volumes" : {"type" : "boolean"},
+        "cold_volumes" : {"type" : "boolean"},
+        "summary_volumes" : {"type" : "boolean"},
+        "indexes" :
+        {
+            "type" : "array",
+            "items" : {"$ref":"#/$defs/index"},
+            "minItems":1
+        }
+    },
+    "required" : ["template","indexes"],
+    "$defs":
+    {
+        "index" :
+        {
+            "properties" :
+            {
+                "name" : {"type" : "string"},
+                "max_size" : {"type" : "integer", "minimum": 0},
+                "replication_factor" : {"type" : "string"},
+                "tsidx_reduction" : {"type" : "boolean"},
+                "home_path" : {"type" : "string"},
+                "cold_path" : {"type" : "string"},
+                "thawed_path" : {"type" : "string"},
+                "data_integrity_control" : {"type" : "boolean"},
+                "summary_max_size" : {"type" : "integer", "minimum": 0},
+                "hot_max_size" : {"type" : "integer", "minimum": 0},
+                "cold_max_size" : {"type" : "integer", "minimum": 0}
+            },
+            "required" : ["name","max_size"]
+        }
+    }
+}

@@ -1,0 +1,56 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://github.com/cybersecuritypoet/splunk-config-apps/util/schema/app-outputs_internal_fwd-schema.json",
+    "title": "Internal Forwarding (outputs)",
+    "description": "Configuration of internal Splunk log forwarding (outputs.conf)",
+    "type": "object",
+    "properties" :
+    {
+        "skip" : {"type" : "boolean"},
+        "template" : {"type" : "string", "enum":["outputs_internal_fwd"]},
+        "enabled" : {"type" : "boolean"},
+        "name" : {"type" : "string"},
+        "prefix" : {"type" : "string"},
+        "postfix" : {"type" : "string"},
+        
+        "default_group" : {"type" : "string"},
+        "ACK" : {"type" : "boolean"},
+        "max_q_size" : {"type" : "string"},
+        "force_time_lb" : {"type" : "boolean"},
+        "time_lb_freq" : {"type" : "integer", "minimum": 0},
+        "volume_lb" : {"type" : "integer", "minimum": 0},
+        "write_timeout" : {"type" : "integer", "minimum": 0},
+        "connection_timeout" : {"type" : "integer", "minimum": 0},
+        "ssl_versions" : {"type": "array","items": {"type": "string"},"minItems":1 },
+        "cipher_suites" : {"type": "array","items": {"type": "string"},"minItems":1 },
+        "ecdh_curves" : {"type": "array","items": {"type": "string"},"minItems":1 },
+        "client_ssl_versions" : {"type": "array","items": {"type": "string"},"minItems":1 },
+        "client_compression" : {"type" : "boolean"},
+        "splunkd_client_compression" : {"type" : "boolean"},
+        "ssl_compression" : {"type" : "boolean"},
+        "verify_crl" : {"type" : "boolean"}
+    },
+    "required" : ["template","default_group"],
+    "$defs":
+    {
+        "group" :
+        {
+            "properties":
+            {
+                "name" : {"type" : "string"},
+                "peers" : {"type" : "array", "items" : {"anyOf": [ {"$ref" : "#/$defs/group_peer" } ]}}
+            },
+            "required" : ["name","peers"]
+        },
+        "group_peer" :
+        {
+            "properties":
+            {
+                "fqdn" : {"type" : "string"},
+                "port" : {"type" : "integer", "minimum": 0},
+                "SQN" : {"type" : "string"}
+            },
+            "required" : ["fqdn"]
+        }
+    }
+}
