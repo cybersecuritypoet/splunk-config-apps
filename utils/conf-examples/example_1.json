@@ -67,7 +67,7 @@
 	[
 		{
 			"name" : "main_indexer_cluster",
-			"path" : "indexer_cluster_1",
+			"path" : "idx_c1",
 			"prefix" : "EXAMPLE_",
 			"postfix" : "_idx_c1",
 			"apps" :
@@ -164,7 +164,7 @@
 		},
 		{
 			"name" : "main_heavy_forwarder_cluster",
-			"path" : "heavy_forwarder_cluster_1",
+			"path" : "hf_c1",
 			"prefix" : "EXAMPLE_",
 			"postfix" : "_hf_c1",
 			"apps" :
@@ -213,7 +213,7 @@
 		},
 		{
 			"name" : "main_search_head_cluster",
-			"path" : "search_head_cluster_1",
+			"path" : "sh_c1",
 			"prefix" : "EXAMPLE_",
 			"postfix" : "_sh_c1",
 			"apps" :
@@ -238,7 +238,7 @@
 		},
 		{
 			"name" : "main_search_head_cluster_deployers",
-			"path" : "search_head_cluster_1_deployers",
+			"path" : "sh_c1_dep",
 			"prefix" : "EXAMPLE_",
 			"postfix" : "_sh_c1_dep",
 			"apps" :
@@ -259,6 +259,35 @@
 				},
 				{ "template" : "web_enable" },
 				{ "template" : "server_deployer_push_threads_auto" },
+				{ "name" : "EXAMPLE_web_disable_all", "skip" : true }
+			]
+		},
+		{
+			"name" : "manager_nodes_for_idx_c1",
+			"path" : "idx_c1_mn",
+			"prefix" : "EXAMPLE_",
+			"postfix" : "_idx_c1_mn",
+			"apps" :
+			[
+				{
+					"template" : "server_ssl_san",
+					"peers" : 
+					[
+							"idx1.example.com",
+							"idx2.example.com",
+							"idx3.example.com",
+							"idx4.example.com",
+							"idx5.example.com",
+							"sh1.example.com",
+							"sh2.example.com",
+							"sh3.example.com",
+							"sh4.example.com",
+							"sh5.example.com",
+							"mn1.example.com",
+							"mn2.example.com"
+					]
+				},
+				{ "template" : "web_enable" },
 				{ "name" : "EXAMPLE_web_disable_all", "skip" : true }
 			]
 		}
