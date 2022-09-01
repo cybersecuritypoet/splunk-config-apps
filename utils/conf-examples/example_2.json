@@ -46,11 +46,9 @@
 						"name" : "idx_c1",
 						"peers" :
 						[
-							{"fqdn" : "idx1.example.com", "port":9997, "SAN" : "idx1.example.com" },
-							{"fqdn" : "idx2.example.com", "port":9997, "SAN" : "idx2.example.com" },
-							{"fqdn" : "idx3.example.com", "port":9997, "SAN" : "idx3.example.com" },
-							{"fqdn" : "idx4.example.com", "port":9997, "SAN" : "idx4.example.com" },
-							{"fqdn" : "idx5.example.com", "port":9997, "SAN" : "idx5.example.com" }
+							{"fqdn" : "{{idx_c1.idx1.fqdn}}", "port":9997, "SAN" : "{{idx_c1.idx1.fqdn}}" },
+							{"fqdn" : "{{idx_c1.idx2.fqdn}}", "port":9997, "SAN" : "{{idx_c1.idx2.fqdn}}" },
+							{"fqdn" : "{{idx_c1.idx3.fqdn}}", "port":9997, "SAN" : "{{idx_c1.idx3.fqdn}}" }
 						]
 					}
 				]
@@ -74,29 +72,25 @@
 			[
 				{
 					"template" : "inputs_internal_fwd",
-					"inputs":
-					[
-						{
-							"port" : 9997,
-							"require_client_cert" : true,
-							"peer_SANs":
-							[
-								"hf1.example.com",
-								"hf2.example.com",
-								"hf3.example.com",
-								"hf4.example.com",
-								"hf5.example.com",
-								"sh1.example.com",
-								"sh2.example.com",
-								"sh3.example.com",
-								"sh4.example.com",
-								"sh5.example.com",
-								"mn1.example.com",
-								"mn2.example.com",
-								"ds1.example.com"
-							]
-						}
-					]
+                    "inputs":
+                    [
+                        {
+                            "port" : 9997,
+                            "require_client_cert" : true,
+                            "peer_SANs":
+                            [
+                                "{{hf_c1.hf1.fqdn}}",
+                                "{{hf_c1.hf2.fqdn}}",
+                                "{{sh_c1.sh1.fqdn}}",
+                                "{{sh_c1.sh2.fqdn}}",
+                                "{{sh_c1.sh3.fqdn}}",
+                                "{{sh.sh1.fqdn}}",
+                                "{{idx_c1.mn1.fqdn}}",
+                                "{{idx_c1.mn2.fqdn}}",
+                                "{{mgmt.ds1.fqdn}}"
+                            ]
+					    }
+                    ]
 				},
 				{ "name" : "EXAMPLE_outputs_internal_fwd_all", "skip" : true },
 				{ "template" : "server_ssl_san", "peers" :  ["mn1.example.com", "mn2.example.com"]},
@@ -154,11 +148,9 @@
 							"require_client_cert" : true,
 							"peers" :
 							[
-								"idx1.example.com",
-								"idx2.example.com",
-								"idx3.example.com",
-								"idx4.example.com",
-								"idx5.example.com"
+                                "{{idx_c1.idx1.fqdn}}",
+                                "{{idx_c1.idx2.fqdn}}",
+                                "{{idx_c1.idx3.fqdn}}"
 							]
 						}
 					]
@@ -208,11 +200,36 @@
 					"template" : "server_ssl_san",
 					"peers" : 
 					[
-						"ds1.example.com",
-						"mn1.example.com",
-						"mn2.example.com"
+						"{{mgmt.ds1.fqdn}}",
+						"{{idx_c1.mn1.fqdn}}",
+						"{{idx_c1.mn2.fqdn}}",
+						"{{idx_c1.mn.fqdn}}"
 					]
 				}
+			]
+		},
+		{
+			"name" : "standalone_search_head",
+			"path" : "sh",
+			"prefix" : "EXAMPLE_",
+			"postfix" : "_sh",
+			"apps" :
+			[
+				{
+					"template" : "server_ssl_san",
+					"peers" : 
+					[
+                        "{{idx_c1.idx1.fqdn}}",
+                        "{{idx_c1.idx2.fqdn}}",
+                        "{{idx_c1.idx3.fqdn}}",
+						"{{idx_c1.mn1.fqdn}}",
+						"{{idx_c1.mn2.fqdn}}",
+						"{{idx_c1.mn.fqdn}}"
+					]
+				},
+				{ "template" : "server_kvstore_dbpath", "path" : "/var/opt/splunk/data/kvstore"},
+				{ "template" : "web_enable" },
+				{ "name" : "EXAMPLE_splunk_config_web_disable_all", "skip" : true }
 			]
 		},
 		{
@@ -226,13 +243,12 @@
 					"template" : "server_ssl_san",
 					"peers" : 
 					[
-						"idx1.example.com",
-						"idx2.example.com",
-						"idx3.example.com",
-						"idx4.example.com",
-						"idx5.example.com",
-						"mn1.example.com",
-						"mn2.example.com"
+                        "{{idx_c1.idx1.fqdn}}",
+                        "{{idx_c1.idx2.fqdn}}",
+                        "{{idx_c1.idx3.fqdn}}",
+						"{{idx_c1.mn1.fqdn}}",
+						"{{idx_c1.mn2.fqdn}}",
+						"{{idx_c1.mn.fqdn}}"
 					]
 				},
 				{ "template" : "server_kvstore_dbpath", "path" : "/var/opt/splunk/data/kvstore"},
@@ -251,14 +267,13 @@
 					"template" : "server_ssl_san",
 					"peers" : 
 					[
-						
-							"sh1.example.com",
-							"sh2.example.com",
-							"sh3.example.com",
-							"sh4.example.com",
-							"sh5.example.com",
-							"mn1.example.com",
-							"mn2.example.com"
+                        "{{sh_c1.sh1.fqdn}}",
+                        "{{sh_c1.sh2.fqdn}}",
+                        "{{sh_c1.sh3.fqdn}}",
+                        "{{sh.sh1.fqdn}}",
+						"{{idx_c1.mn1.fqdn}}",
+						"{{idx_c1.mn2.fqdn}}",
+						"{{idx_c1.mn.fqdn}}"
 					]
 				},
 				{ "template" : "web_enable" },
@@ -277,18 +292,16 @@
 					"template" : "server_ssl_san",
 					"peers" : 
 					[
-							"idx1.example.com",
-							"idx2.example.com",
-							"idx3.example.com",
-							"idx4.example.com",
-							"idx5.example.com",
-							"sh1.example.com",
-							"sh2.example.com",
-							"sh3.example.com",
-							"sh4.example.com",
-							"sh5.example.com",
-							"mn1.example.com",
-							"mn2.example.com"
+                        "{{idx_c1.idx1.fqdn}}",
+                        "{{idx_c1.idx2.fqdn}}",
+                        "{{idx_c1.idx3.fqdn}}",
+                        "{{sh_c1.sh1.fqdn}}",
+                        "{{sh_c1.sh2.fqdn}}",
+                        "{{sh_c1.sh3.fqdn}}",
+                        "{{sh.sh1.fqdn}}",
+						"{{idx_c1.mn1.fqdn}}",
+						"{{idx_c1.mn2.fqdn}}",
+						"{{idx_c1.mn.fqdn}}"
 					]
 				},
 				{ "template" : "web_enable" },

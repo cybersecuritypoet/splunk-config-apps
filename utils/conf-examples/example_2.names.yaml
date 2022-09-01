@@ -1,0 +1,31 @@
+idx_c1:
+  idx1:
+    fqdn: "idx1.example.com"
+  idx2:
+    fqdn: "idx2.example.com"
+  idx3:
+    fqdn: "idx3.example.com"
+  mn:
+    fqdn: "mn.example.com"
+  mn1:
+    fqdn: "mn1.example.com"
+  mn2:
+    fqdn: "mn2.example.com"
+sh_c1:
+  sh1:
+    fqdn: "sh1.example.com"
+  sh2:
+    fqdn: "sh2.example.com"
+  sh3:
+    fqdn: "sh3.example.com"
+hf_c1:
+  hf1:
+    fqdn: "hf1.example.com"
+  hf2:
+    fqdn: "hf2.example.com"
+mgmt:
+  ds1:
+    fqdn: "ds1.example.com"
+sh:
+  sh1:
+    fqdn: "sh4.example.com"
