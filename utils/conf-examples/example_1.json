@@ -1,5 +1,5 @@
 {
-	"$schema": "../json-schema/apps-config-schema.json",
+	"$schema": "https://raw.githubusercontent.com/cybersecuritypoet/splunk-config-apps/master/utils/json-schema/apps-config-schema.json",
 	"globals" :
 	{
 		"SSL" :

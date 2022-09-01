@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://github.com/cybersecuritypoet/splunk-config-apps/util/schema/app-server_ssl_san-schema.json",
+    "$id": "https://raw.githubusercontent.com/cybersecuritypoet/splunk-config-apps/master/utils/json-schema/app-server_ssl_san-schema.json",
     "title": "Splunk SSL allowed SANs",
     "description": "Configuration of allowed SANs on splunkd management port",
     "type": "object",
@@ -8,7 +8,7 @@
     {
         
         "skip" : {"type" : "boolean"},
-        "template" : {"type" : "string", "pattern":"server_ssl_san"},
+        "template" : {"type" : "string", "pattern":"^server_ssl_san$"},
         "enabled" : {"type" : "boolean"},
         "name" : {"type" : "string"},
         "prefix" : {"type" : "string"},

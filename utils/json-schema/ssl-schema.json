@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://github.com/cybersecuritypoet/splunk-config-apps/util/schema/ssl-schema.json",
+    "$id": "https://raw.githubusercontent.com/cybersecuritypoet/splunk-config-apps/master/utils/json-schema/ssl-schema.json",
     "title": "SSL Config",
     "description": "Configuration of SSL parameters",
     "type": "object",

@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://github.com/cybersecuritypoet/splunk-config-apps/util/schema/app-indexes-schema.json",
+    "$id": "https://raw.githubusercontent.com/cybersecuritypoet/splunk-config-apps/master/utils/json-schema/app-indexes-schema.json",
     "title": "Splunk Indexes config",
     "description": "Configuration of Indexes",
     "type": "object",
