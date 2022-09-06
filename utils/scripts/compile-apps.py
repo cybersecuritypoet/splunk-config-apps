@@ -34,18 +34,24 @@ def verify_config(conf):
 			print("Missing name definition in group")
 			exit(2)
 
-def fix_group(group):
+def fix_group(group, globals):
 	if "prefix" not in group.keys():
-		group["prefix"] = ""
+		group["prefix"] = globals["prefix"]
 	if "postfix" not in group.keys():
-		group["postfix"] = ""
+		group["postfix"]= globals["postfix"]
 	return group
 
-def fix_app(app, globals):
+def fix_app(app, group, globals):
 	if "prefix" not in app.keys():
-		app["prefix"] = globals["prefix"]
+		if group is not None and "prefix" in group.keys():
+			app["prefix"] = group["prefix"]
+		else:
+			app["prefix"] = globals["prefix"]
 	if "postfix" not in app.keys():
-		app["postfix"] = globals["postfix"]
+		if group is not None and "postfix" in group.keys():
+			app["postfix"] = group["postfix"]
+		else:
+			app["postfix"] = globals["postfix"]
 	if "name" not in app.keys():
 		app["name"] = app["prefix"]+app["template"]+app["postfix"]
 	if "SSL" in app.keys():
@@ -66,15 +72,15 @@ def load_data(cfg_file):
 			exit(21)
 		verify_config(obj)
 		for app in obj["globals"]["apps"]:
-			global_apps[app["name"]] = fix_app(app,obj["globals"])
+			global_apps[app["name"]] = fix_app(app,None,obj["globals"])
 		for group in obj["groups"]:
-			group = fix_group(group)
+			group = fix_group(group,obj["globals"])
 			groups[group["name"]] = group.copy()
 			groups[group["name"]]["apps"] = {}
 			for app in obj["globals"]["apps"]:
-				groups[group["name"]]["apps"][app["name"]] = fix_app(app,obj["globals"])
+				groups[group["name"]]["apps"][app["name"]] = fix_app(app,None,obj["globals"])
 			for app in group["apps"]:
-				app = fix_app(app,obj["globals"])
+				app = fix_app(app, group, obj["globals"])
 				if app["name"] in global_apps.keys():
 					groups[group["name"]]["apps"][app["name"]]=merge_obj(global_apps[app["name"]],app)
 				else:
