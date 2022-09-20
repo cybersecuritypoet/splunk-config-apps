@@ -112,9 +112,13 @@
 					"global_summary_volume_path" : "/var/opt/splunk/data/summary",
 					"global_summary_volume_name" : "idx_global_summary",
 					"global_summary_volume_max_size" : 4096,
+					"global_datamodel_summary_volume_path" : "/var/opt/splunk/data/datamodel_summary",
+					"global_datamodel_summary_volume_name" : "idx_global_datamodel_summary",
+					"global_datamodel_summary_volume_max_size" : 5242880,
 					"hot_volumes" : true,
 					"cold_volumes" : true,
 					"summary_volumes" : true,
+					"datamodel_summary_volumes" : true,
 					"indexes" : 
 					[
 						{
@@ -130,8 +134,8 @@
 							"hot_max_size" : 512,
 							"cold_max_size" : 512
 						},
-						{ "name" : "default_lastchance", "max_size" : 1024, "summary_max_size" : 8, "hot_max_size" : 512, "cold_max_size" : 512 },
-						{ "name" : "default_example_com", "max_size" : 2048, "summary_max_size" : 8, "hot_max_size" : 1024, "cold_max_size" : 1024 }
+						{ "name" : "default_lastchance", "max_size" : 1024, "summary_max_size" : 8, "hot_max_size" : 512, "cold_max_size" : 512, "datamode_summary_max_size": 512 },
+						{ "name" : "default_example_com", "max_size" : 2048, "summary_max_size" : 8, "hot_max_size" : 1024, "cold_max_size" : 1024, "datamode_summary_max_size": 1024 }
 					]
 				},
 				{
