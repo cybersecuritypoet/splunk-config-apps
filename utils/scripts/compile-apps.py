@@ -83,14 +83,16 @@ def load_data(cfg_file):
 			print("Unknown file extension: "+os.path.splitext(cfg_file)[1]+" ; Supported extensions: yaml, json.")
 			exit(23)
 		verify_config(obj)
-		for app in obj["globals"]["apps"]:
-			global_apps[app["name"]] = fix_app(app,None,obj["globals"])
+		if "apps" in obj["globals"].keys():
+			for app in obj["globals"]["apps"]:
+				global_apps[app["name"]] = fix_app(app,None,obj["globals"])
 		for group in obj["groups"]:
 			group = fix_group(group,obj["globals"])
 			groups[group["name"]] = group.copy()
 			groups[group["name"]]["apps"] = {}
-			for app in obj["globals"]["apps"]:
-				groups[group["name"]]["apps"][app["name"]] = fix_app(app,None,obj["globals"])
+			if "apps" in obj["globals"].keys():
+				for app in obj["globals"]["apps"]:
+					groups[group["name"]]["apps"][app["name"]] = fix_app(app,None,obj["globals"])
 			for app in group["apps"]:
 				app = fix_app(app, group, obj["globals"])
 				if app["name"] in global_apps.keys():
