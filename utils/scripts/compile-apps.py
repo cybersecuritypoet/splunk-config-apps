@@ -3,7 +3,7 @@ import jinja2
 import yaml
 import os
 import sys
-
+import argparse
 
 def merge_obj(obj1, obj2):
 	new_obj = {}
@@ -60,7 +60,7 @@ def fix_app(app, group, globals):
 	return app
 
 
-def load_data(cfg_file):
+def load_data(cfg_file,quiet=False):
 	global_apps = {}
 	groups = {}
 	with open(cfg_file) as f:
@@ -69,18 +69,21 @@ def load_data(cfg_file):
 			try:
 				obj = json.loads(data)
 			except json.decoder.JSONDecodeError as ex:
-				print("JSON error: "+ex.msg+" line: "+str(ex.lineno)+" column: "+str(ex.colno)+" (char: "+str(ex.pos)+") ; file: "+cfg_file)
-				print('! Exiting (21).')
+				if not quiet:
+					print("JSON error: "+ex.msg+" line: "+str(ex.lineno)+" column: "+str(ex.colno)+" (char: "+str(ex.pos)+") ; file: "+cfg_file)
+					print('! Exiting (21).')
 				exit(21)
 		elif(os.path.splitext(cfg_file)[1] == ".yaml"):
 			try:
 				obj = yaml.safe_load(data)
 			except:
-				print("Exception while loading YAML")
+				if not quiet:
+					print("Exception while loading YAML")
 				raise
 				exit(21)
 		else:
-			print("Unknown file extension: "+os.path.splitext(cfg_file)[1]+" ; Supported extensions: yaml, json.")
+			if not quiet:
+				print("Unknown file extension: "+os.path.splitext(cfg_file)[1]+" ; Supported extensions: yaml, json.")
 			exit(23)
 		verify_config(obj)
 		if "apps" in obj["globals"].keys():
@@ -101,7 +104,7 @@ def load_data(cfg_file):
 					groups[group["name"]]["apps"][app["name"]]=app
 	return groups
 
-def render_data(groups,tpl_path,apps_sources_tpl_path,out_path):
+def render_data(groups,tpl_path,apps_sources_tpl_path,out_path,quiet=False):
 	for group in groups.values():
 		if "path" not in group.keys():
 			group["path"] = group["name"]
@@ -117,12 +120,14 @@ def render_data(groups,tpl_path,apps_sources_tpl_path,out_path):
 							file_path = os.path.join(root,e)
 							if os.path.isfile(file_path):
 								with open(file_path,"r") as tpl:
-									print('. Rendering: '+file_path)
+									if not quiet:
+										print('. Rendering: '+file_path)
 									try:
 										j2template = jinja2.Environment(loader=jinja2.FileSystemLoader(apps_sources_tpl_path)).from_string(tpl.read())
 									except jinja2.exceptions.TemplateSyntaxError as ex:
-										print("!  Template error : "+ex.message+" In file: "+file_path+" ; line: "+str(ex.lineno))
-										print("! Exiting (4).")
+										if not quiet:
+											print("!  Template error : "+ex.message+" In file: "+file_path+" ; line: "+str(ex.lineno))
+											print("! Exiting (4).")
 										exit(4)
 									dir_path = os.path.join(app_out_path,os.path.relpath(root,source_apps_tpl_path))
 									os.makedirs(dir_path,0o700,True)
@@ -130,14 +135,17 @@ def render_data(groups,tpl_path,apps_sources_tpl_path,out_path):
 										try:
 											content = j2template.render(conf=source_app, undefined=jinja2.StrictUndefined)
 										except jinja2.exceptions.UndefinedError as ex:
-											print('! Template error : '+ex.message+' In file: '+file_path)
-											print('! Exiting (5).')
+											if not quiet:
+												print('! Template error : '+ex.message+' In file: '+file_path)
+												print('! Exiting (5).')
 											exit(5)
 										except TypeError as ex:
-											print('! Type error : '+str(ex.args)+' In file: '+file_path)
-											print('! Exiting (5).')
+											if not quiet:
+												print('! Type error : '+str(ex.args)+' In file: '+file_path)
+												print('! Exiting (5).')
 											exit(5)
-										print('+ Writing: '+os.path.join(dir_path,e))
+										if not quiet:
+											print('+ Writing: '+os.path.join(dir_path,e))
 										f.write(content)
 		if (tpl_path is not None and "apps" in group.keys()):
 			for app in group["apps"].values():
@@ -149,12 +157,14 @@ def render_data(groups,tpl_path,apps_sources_tpl_path,out_path):
 							file_path = os.path.join(root,e)
 							if os.path.isfile(file_path):
 								with open(file_path,"r") as tpl:
-									print('. Rendering: '+file_path)
+									if not quiet:
+										print('. Rendering: '+file_path)
 									try:
 										j2template = jinja2.Environment(loader=jinja2.FileSystemLoader(tpl_path)).from_string(tpl.read())
 									except jinja2.exceptions.TemplateSyntaxError as ex:
-										print("!  Template error : "+ex.message+" In file: "+file_path+" ; line: "+str(ex.lineno))
-										print("! Exiting (4).")
+										if not quiet:
+											print("!  Template error : "+ex.message+" In file: "+file_path+" ; line: "+str(ex.lineno))
+											print("! Exiting (4).")
 										exit(4)
 									dir_path = os.path.join(app_out_path,os.path.relpath(root,app_tpl_path))
 									os.makedirs(dir_path,0o700,True)
@@ -162,14 +172,17 @@ def render_data(groups,tpl_path,apps_sources_tpl_path,out_path):
 										try:
 											content = j2template.render(conf=app, undefined=jinja2.StrictUndefined)
 										except jinja2.exceptions.UndefinedError as ex:
-											print('! Template error : '+ex.message+' In file: '+file_path)
-											print('! Exiting (5).')
+											if not quiet:
+												print('! Template error : '+ex.message+' In file: '+file_path)
+												print('! Exiting (5).')
 											exit(5)
 										except TypeError as ex:
-											print('! Type error : '+str(ex.args)+' In file: '+file_path)
-											print('! Exiting (5).')
+											if not quiet:
+												print('! Type error : '+str(ex.args)+' In file: '+file_path)
+												print('! Exiting (5).')
 											exit(5)
-										print('+ Writing: '+os.path.join(dir_path,e))
+										if not quiet:
+											print('+ Writing: '+os.path.join(dir_path,e))
 										f.write(content)
 
 def main():
@@ -177,19 +190,31 @@ def main():
 	cfg_file = ""
 	out_path = "../compiled_apps/"
 	apps_sources_tpl_path = None
+	quiet = False
 
-	if(len(sys.argv) <= 1):
-		print("Please provide at least 1 argument: compile-apps.py <cfg_file> [out_path] [app_tpl_path] [apps_sources_tpl_path]")
-		exit(1)
+	argparser = argparse.ArgumentParser(description = "Generates PKI install scripts")
 
-	if(len(sys.argv) >=2):
-		cfg_file = sys.argv[1]
-	if(len(sys.argv) >=3):
-		out_path = sys.argv[2]
-	if(len(sys.argv) >=4):
-		tpl_path = sys.argv[3]
-	if(len(sys.argv) >=5):
-		apps_sources_tpl_path = sys.argv[4]
+	argparser.add_argument( "config", help = "Configuration file")
+	argparser.add_argument( "out_path", help = "Path where resulting apps will be written")
+	argparser.add_argument( "apps_template_path", help = "Application template path")
+	argparser.add_argument( "apps_sources_template_path", help = "Application (sources) template path")
+	argparser.add_argument("-q", "--quiet", action='store_true', help="Quiet output")
+
+	args = argparser.parse_args()
+
+	if args.quiet:
+		quiet = True
+	if args.config:
+		cfg_file = args.config
+	if args.out_path:
+		out_path = args.out_path
+	if args.apps_template_path:
+		tpl_path = args.apps_template_path
+	if args.apps_sources_template_path:
+		apps_sources_tpl_path = args.apps_sources_template_path
+		
+
+	
 
 	if(not os.path.exists(cfg_file)):
 		print("No such file: "+cfg_file)
@@ -201,7 +226,7 @@ def main():
 		print("No such directory: "+apps_sources_tpl_path)
 		exit(2)
 		
-	groups = load_data(cfg_file)
-	render_data(groups,tpl_path,apps_sources_tpl_path,out_path)
+	groups = load_data(cfg_file,quiet)
+	render_data(groups,tpl_path,apps_sources_tpl_path,out_path,quiet)
 
 main()
