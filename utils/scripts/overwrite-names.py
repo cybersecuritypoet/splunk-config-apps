@@ -16,7 +16,7 @@ def load_vars(vars_file,quiet=False):
                     print("JSON error: "+ex.msg+" line: "+str(ex.lineno)+" column: "+str(ex.colno)+" (char: "+str(ex.pos)+") ; file: "+vars_file)
                     print('! Exiting (21).')
                 exit(21)
-        elif(os.path.splitext(vars_file)[1] == ".yaml"):
+        elif(os.path.splitext(vars_file)[1] == ".yaml" or os.path.splitext(vars_file)[1] == ".yml"):
             try:
                 obj = yaml.safe_load(file)
             except:
@@ -26,7 +26,7 @@ def load_vars(vars_file,quiet=False):
                 exit(21)
         else:
             if not quiet:
-                print("Unknown file extension: "+os.path.splitext(vars_file)[1]+" ; Supported extensions: yaml, json.")
+                print("Unknown file extension: "+os.path.splitext(vars_file)[1]+" ; Supported extensions: yml/yaml, json.")
             exit(23)
         return obj
 

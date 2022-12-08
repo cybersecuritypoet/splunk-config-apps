@@ -73,7 +73,7 @@ def load_data(cfg_file,quiet=False):
 					print("JSON error: "+ex.msg+" line: "+str(ex.lineno)+" column: "+str(ex.colno)+" (char: "+str(ex.pos)+") ; file: "+cfg_file)
 					print('! Exiting (21).')
 				exit(21)
-		elif(os.path.splitext(cfg_file)[1] == ".yaml"):
+		elif(os.path.splitext(cfg_file)[1] == ".yaml" or os.path.splitext(cfg_file)[1] == ".yml"):
 			try:
 				obj = yaml.safe_load(data)
 			except:
@@ -83,7 +83,7 @@ def load_data(cfg_file,quiet=False):
 				exit(21)
 		else:
 			if not quiet:
-				print("Unknown file extension: "+os.path.splitext(cfg_file)[1]+" ; Supported extensions: yaml, json.")
+				print("Unknown file extension: "+os.path.splitext(cfg_file)[1]+" ; Supported extensions: yml, yaml, json.")
 			exit(23)
 		verify_config(obj)
 		if "apps" in obj["globals"].keys():
