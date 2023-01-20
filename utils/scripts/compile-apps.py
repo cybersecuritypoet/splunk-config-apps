@@ -28,9 +28,9 @@ def verify_config(conf):
 		print("Missing groups definition in config")
 		exit(2)
 	for group in conf["groups"]:
-		if "apps" not in group.keys():
-			print("Missing apps definition in group")
-			exit(2)
+		#if "apps" not in group.keys():
+		#	print("Missing apps definition in group")
+		#	exit(2)
 		if "name" not in group.keys():
 			print("Missing name definition in group")
 			exit(2)
@@ -93,15 +93,16 @@ def load_data(cfg_file,quiet=False):
 			group = fix_group(group,obj["globals"])
 			groups[group["name"]] = group.copy()
 			groups[group["name"]]["apps"] = {}
-			if "apps" in obj["globals"].keys():
+			if "apps" in obj["globals"].keys() and not ("skip_global_apps" in group.keys() and group["skip_global_apps"]):
 				for app in obj["globals"]["apps"]:
 					groups[group["name"]]["apps"][app["name"]] = fix_app(app,None,obj["globals"])
-			for app in group["apps"]:
-				app = fix_app(app, group, obj["globals"])
-				if app["name"] in global_apps.keys():
-					groups[group["name"]]["apps"][app["name"]]=merge_obj(global_apps[app["name"]],app)
-				else:
-					groups[group["name"]]["apps"][app["name"]]=app
+			if "apps" in group.keys():
+				for app in group["apps"]:
+					app = fix_app(app, group, obj["globals"])
+					if app["name"] in global_apps.keys():
+						groups[group["name"]]["apps"][app["name"]]=merge_obj(global_apps[app["name"]],app)
+					else:
+						groups[group["name"]]["apps"][app["name"]]=app
 	return groups
 
 def render_data(groups,tpl_path,apps_sources_tpl_path,out_path,quiet=False):
