@@ -106,6 +106,7 @@ def load_data(cfg_file,quiet=False):
 	return groups
 
 def render_data(groups,tpl_path,apps_sources_tpl_path,out_path,quiet=False):
+	default_meta_template = os.path.join(tpl_path,"_default_meta")
 	for group in groups.values():
 		if "path" not in group.keys():
 			group["path"] = group["name"]
@@ -153,6 +154,39 @@ def render_data(groups,tpl_path,apps_sources_tpl_path,out_path,quiet=False):
 				if not ("skip" in app.keys() and app["skip"] == True ):
 					app_tpl_path = os.path.join(tpl_path,app["template"])
 					app_out_path = os.path.join(group_path,app["name"])
+					if( "default_meta" in app.keys() ) :
+						for root, dirs, files in os.walk(default_meta_template):
+							for e in files:
+								file_path = os.path.join(root,e)
+								if os.path.isfile(file_path):
+									with open(file_path,"r") as tpl:
+										if not quiet:
+											print('. Rendering: '+file_path)
+										try:
+											j2template = jinja2.Environment(loader=jinja2.FileSystemLoader(tpl_path)).from_string(tpl.read())
+										except jinja2.exceptions.TemplateSyntaxError as ex:
+											if not quiet:
+												print("!  Template error : "+ex.message+" In file: "+file_path+" ; line: "+str(ex.lineno))
+												print("! Exiting (14).")
+											exit(4)
+										dir_path = os.path.join(app_out_path,os.path.relpath(root,default_meta_template))
+										os.makedirs(dir_path,0o700,True)
+										with open(os.path.join(dir_path,e),"w") as f:
+											try:
+												content = j2template.render(conf=app, undefined=jinja2.StrictUndefined)
+											except jinja2.exceptions.UndefinedError as ex:
+												if not quiet:
+													print('! Template error : '+ex.message+' In file: '+file_path)
+													print('! Exiting (15).')
+												exit(5)
+											except TypeError as ex:
+												if not quiet:
+													print('! Type error : '+str(ex.args)+' In file: '+file_path)
+													print('! Exiting (15).')
+												exit(5)
+											if not quiet:
+												print('+ Writing: '+os.path.join(dir_path,e))
+											f.write(content)
 					for root, dirs, files in os.walk(app_tpl_path):
 						for e in files:
 							file_path = os.path.join(root,e)
