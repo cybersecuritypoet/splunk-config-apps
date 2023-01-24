@@ -5,6 +5,75 @@ import os
 import sys
 import argparse
 
+
+def generate_app(app, tpl_path, group_path, default_meta_template, quiet):
+	app_tpl_path = os.path.join(tpl_path,app["template"])
+	app_out_path = os.path.join(group_path,app["name"])
+	if( "default_meta" in app.keys() ) :
+		for root, dirs, files in os.walk(default_meta_template):
+			for e in files:
+				file_path = os.path.join(root,e)
+				if os.path.isfile(file_path):
+					with open(file_path,"r") as tpl:
+						if not quiet:
+							print('. Rendering: '+file_path)
+						try:
+							j2template = jinja2.Environment(loader=jinja2.FileSystemLoader(tpl_path)).from_string(tpl.read())
+						except jinja2.exceptions.TemplateSyntaxError as ex:
+							if not quiet:
+								print("!  Template error : "+ex.message+" In file: "+file_path+" ; line: "+str(ex.lineno))
+								print("! Exiting (14).")
+							exit(4)
+						dir_path = os.path.join(app_out_path,os.path.relpath(root,default_meta_template))
+						os.makedirs(dir_path,0o700,True)
+						with open(os.path.join(dir_path,e),"w") as f:
+							try:
+								content = j2template.render(conf=app, undefined=jinja2.StrictUndefined)
+							except jinja2.exceptions.UndefinedError as ex:
+								if not quiet:
+									print('! Template error : '+ex.message+' In file: '+file_path)
+									print('! Exiting (15).')
+								exit(5)
+							except TypeError as ex:
+								if not quiet:
+									print('! Type error : '+str(ex.args)+' In file: '+file_path)
+									print('! Exiting (15).')
+								exit(5)
+							if not quiet:
+								print('+ Writing: '+os.path.join(dir_path,e))
+							f.write(content)
+	for root, dirs, files in os.walk(app_tpl_path):
+		for e in files:
+			file_path = os.path.join(root,e)
+			if os.path.isfile(file_path):
+				with open(file_path,"r") as tpl:
+					if not quiet:
+						print('. Rendering: '+file_path)
+					try:
+						j2template = jinja2.Environment(loader=jinja2.FileSystemLoader(tpl_path)).from_string(tpl.read())
+					except jinja2.exceptions.TemplateSyntaxError as ex:
+						if not quiet:
+							print("!  Template error : "+ex.message+" In file: "+file_path+" ; line: "+str(ex.lineno))
+							print("! Exiting (4).")
+						exit(4)
+					dir_path = os.path.join(app_out_path,os.path.relpath(root,app_tpl_path))
+					os.makedirs(dir_path,0o700,True)
+					with open(os.path.join(dir_path,e),"w") as f:
+						try:
+							content = j2template.render(conf=app, undefined=jinja2.StrictUndefined)
+						except jinja2.exceptions.UndefinedError as ex:
+							if not quiet:
+								print('! Template error : '+ex.message+' In file: '+file_path)
+								print('! Exiting (5).')
+							exit(5)
+						except TypeError as ex:
+							if not quiet:
+								print('! Type error : '+str(ex.args)+' In file: '+file_path)
+								print('! Exiting (5).')
+							exit(5)
+						if not quiet:
+							print('+ Writing: '+os.path.join(dir_path,e))
+						f.write(content)
 def merge_obj(obj1, obj2):
 	new_obj = {}
 	new_obj.update(obj1)
@@ -21,8 +90,8 @@ def verify_config(conf):
 	if "prefix" not in conf["globals"].keys():
 		print("Missing globals prefix definition in config")
 		exit(2)
-	if "postfix" not in conf["globals"].keys():
-		print("Missing globals postfix definition in config")
+	if "postfix" not in conf["globals"].keys() and "suffix" not in conf["globals"].keys():
+		print("Missing globals postfix/suffix definition in config")
 		exit(2)
 	if "groups" not in conf.keys():
 		print("Missing groups definition in config")
@@ -39,7 +108,10 @@ def fix_group(group, globals):
 	if "prefix" not in group.keys():
 		group["prefix"] = globals["prefix"]
 	if "postfix" not in group.keys():
-		group["postfix"]= globals["postfix"]
+		if "suffix" in globals.keys() and globals["suffix"] != "" and not str.isspace(globals["suffix"]):
+			group["postfix"] = globals["suffix"]
+		else:
+			group["postfix"] = globals["postfix"]
 	return group
 
 def fix_app(app, group, globals):
@@ -48,12 +120,20 @@ def fix_app(app, group, globals):
 			app["prefix"] = group["prefix"]
 		else:
 			app["prefix"] = globals["prefix"]
-	if "postfix" not in app.keys():
-		if group is not None and "postfix" in group.keys():
-			app["postfix"] = group["postfix"]
+	if ("postfix" not in app.keys() or app["postfix"] == "" or str.isspace(app["postfix"])):
+		if not ("suffix" not in app.keys() or app["suffix"] == "" or str.issspace(app["suffix"])):
+			app["postfix"] = app["suffix"]
 		else:
-			app["postfix"] = globals["postfix"]
-	if "name" not in app.keys():
+			if group is not None and "suffix" in group.keys() and group["suffix"] != "" and not str.isspace(group["suffix"]):
+				app["postfix"] = group["suffix"]
+			elif group is not None and "postfix" in group.keys() and group["postfix"] != "" and not str.isspace(group["postfix"]):
+				app["postfix"] = group["postfix"]
+			else:
+				if "suffix" in globals.keys() and globals["suffix"] != "" and not str.isspace(globals["suffix"]):
+					app["postfix"] = globals["suffix"]
+				else:
+					app["postfix"] = globals["postfix"]
+	if "name" not in app.keys() or app["name"] == "" or str.isspace(app["name"]) :
 		app["name"] = app["prefix"]+app["template"]+app["postfix"]
 	if "SSL" in app.keys():
 		app["SSL"] = merge_obj(globals["SSL"],app["SSL"])
@@ -115,110 +195,11 @@ def render_data(groups,tpl_path,apps_sources_tpl_path,out_path,quiet=False):
 		if (apps_sources_tpl_path is not None and "source_apps" in group.keys()):
 			for source_app in group["source_apps"]:
 				if not ("skip" in source_app.keys() and source_app["skip"] == True ):
-					source_apps_tpl_path = os.path.join(apps_sources_tpl_path,source_app["template"])
-					app_out_path = os.path.join(group_path,source_app["name"])
-					for root, dirs, files in os.walk(source_apps_tpl_path):
-						for e in files:
-							file_path = os.path.join(root,e)
-							if os.path.isfile(file_path):
-								with open(file_path,"r") as tpl:
-									if not quiet:
-										print('. Rendering: '+file_path)
-									try:
-										j2template = jinja2.Environment(loader=jinja2.FileSystemLoader(apps_sources_tpl_path)).from_string(tpl.read())
-									except jinja2.exceptions.TemplateSyntaxError as ex:
-										if not quiet:
-											print("!  Template error : "+ex.message+" In file: "+file_path+" ; line: "+str(ex.lineno))
-											print("! Exiting (4).")
-										exit(4)
-									dir_path = os.path.join(app_out_path,os.path.relpath(root,source_apps_tpl_path))
-									os.makedirs(dir_path,0o700,True)
-									with open(os.path.join(dir_path,e),"w") as f:
-										try:
-											content = j2template.render(conf=source_app, undefined=jinja2.StrictUndefined)
-										except jinja2.exceptions.UndefinedError as ex:
-											if not quiet:
-												print('! Template error : '+ex.message+' In file: '+file_path)
-												print('! Exiting (5).')
-											exit(5)
-										except TypeError as ex:
-											if not quiet:
-												print('! Type error : '+str(ex.args)+' In file: '+file_path)
-												print('! Exiting (5).')
-											exit(5)
-										if not quiet:
-											print('+ Writing: '+os.path.join(dir_path,e))
-										f.write(content)
+					generate_app(source_app, apps_sources_tpl_path, group_path, default_meta_template, quiet)
 		if (tpl_path is not None and "apps" in group.keys()):
 			for app in group["apps"].values():
 				if not ("skip" in app.keys() and app["skip"] == True ):
-					app_tpl_path = os.path.join(tpl_path,app["template"])
-					app_out_path = os.path.join(group_path,app["name"])
-					if( "default_meta" in app.keys() ) :
-						for root, dirs, files in os.walk(default_meta_template):
-							for e in files:
-								file_path = os.path.join(root,e)
-								if os.path.isfile(file_path):
-									with open(file_path,"r") as tpl:
-										if not quiet:
-											print('. Rendering: '+file_path)
-										try:
-											j2template = jinja2.Environment(loader=jinja2.FileSystemLoader(tpl_path)).from_string(tpl.read())
-										except jinja2.exceptions.TemplateSyntaxError as ex:
-											if not quiet:
-												print("!  Template error : "+ex.message+" In file: "+file_path+" ; line: "+str(ex.lineno))
-												print("! Exiting (14).")
-											exit(4)
-										dir_path = os.path.join(app_out_path,os.path.relpath(root,default_meta_template))
-										os.makedirs(dir_path,0o700,True)
-										with open(os.path.join(dir_path,e),"w") as f:
-											try:
-												content = j2template.render(conf=app, undefined=jinja2.StrictUndefined)
-											except jinja2.exceptions.UndefinedError as ex:
-												if not quiet:
-													print('! Template error : '+ex.message+' In file: '+file_path)
-													print('! Exiting (15).')
-												exit(5)
-											except TypeError as ex:
-												if not quiet:
-													print('! Type error : '+str(ex.args)+' In file: '+file_path)
-													print('! Exiting (15).')
-												exit(5)
-											if not quiet:
-												print('+ Writing: '+os.path.join(dir_path,e))
-											f.write(content)
-					for root, dirs, files in os.walk(app_tpl_path):
-						for e in files:
-							file_path = os.path.join(root,e)
-							if os.path.isfile(file_path):
-								with open(file_path,"r") as tpl:
-									if not quiet:
-										print('. Rendering: '+file_path)
-									try:
-										j2template = jinja2.Environment(loader=jinja2.FileSystemLoader(tpl_path)).from_string(tpl.read())
-									except jinja2.exceptions.TemplateSyntaxError as ex:
-										if not quiet:
-											print("!  Template error : "+ex.message+" In file: "+file_path+" ; line: "+str(ex.lineno))
-											print("! Exiting (4).")
-										exit(4)
-									dir_path = os.path.join(app_out_path,os.path.relpath(root,app_tpl_path))
-									os.makedirs(dir_path,0o700,True)
-									with open(os.path.join(dir_path,e),"w") as f:
-										try:
-											content = j2template.render(conf=app, undefined=jinja2.StrictUndefined)
-										except jinja2.exceptions.UndefinedError as ex:
-											if not quiet:
-												print('! Template error : '+ex.message+' In file: '+file_path)
-												print('! Exiting (5).')
-											exit(5)
-										except TypeError as ex:
-											if not quiet:
-												print('! Type error : '+str(ex.args)+' In file: '+file_path)
-												print('! Exiting (5).')
-											exit(5)
-										if not quiet:
-											print('+ Writing: '+os.path.join(dir_path,e))
-										f.write(content)
+					generate_app(app, tpl_path, group_path, default_meta_template, quiet)
 
 def main():
 	tpl_path = "../apps/"
