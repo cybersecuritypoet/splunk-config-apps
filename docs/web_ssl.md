@@ -9,7 +9,7 @@ All values must be set in the __SSL__ object.
 |dh_file_path|dhFile|string|/etc/pki/tls/private/splunk-dh.pem|Path to DH param file|
 |key_path|privKeyPath|string|/etc/pki/tls/private/splunk.key|Path to DH param file|
 |cert_path|serverCert|string|/etc/pki/tls/certs/splunk.crt|Path to DH param file|
-|require_cert|requireClientCert|bool|-|Controls whether authentication with SSL certificate is required|
+|web_require_cert|requireClientCert|bool|-|Controls whether authentication with SSL certificate is required|
 |key_password|sslPassword|string|-|Encryption key for private key|
 |hsts_subdomains|includeSubDomains|bool|-|Include subdomains in HSTS security header|
 |handshake_timeout|sslServerHandshakeTimeout|int|60||
@@ -31,7 +31,7 @@ All values must be set in the __SSL__ object.
 		"ecdh_curves" : ["secp521r1","secp384r1"],
 		"ssl_versions" : ["tls1.2"],
 		"hsts_subdomains" : true,
-		"require_cert" : true,
+		"web_require_cert" : false,
 		"handshake_timeout" : 30
 	}
 }
