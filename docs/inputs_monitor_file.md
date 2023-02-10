@@ -1,10 +1,17 @@
 # File input definition (inputs.conf) [inputs_monitor_file]
-## Values
 
-All values must be set in the global object.
+# App config
+
+| Name                           |     Type     | Required | Default |               Desc                |
+|--------------------------------|--------------|----------|---------|-----------------------------------|
+| inputs                         | array[input] | false    | -       | All inputs should be defined here |
+
+
+## Input object
 
 | Name                           | SplunkName                     | Type   | Required | Default | Desc |
 |--------------------------------|--------------------------------|--------|----------|---------|------|
+| disabled                       | disabled                       | bool   |          | false   |      |
 | path                           | path                           | string | true     | -       |      |
 | index                          | index                          | string | true     | -       |      |
 | sourcetype                     | sourcetype                     | string | true     | -       |      |
@@ -14,7 +21,7 @@ All values must be set in the global object.
 | blacklist                      | blacklist                      | string |          | -       |      |
 | crc_salt                       | crcSalt                        | string |          | -       |      |
 | init_crc_len                   | initCrcLength                  | int    |          | -       |      |
-| ignore_older_than              | ignoreOlderThan                | int    |          | -       |      |
+| ignore_older_than              | ignoreOlderThan                | string |          | -       |      |
 | follow_tail                    | followTail                     | bool   |          | -       |      |
 | always_open                    | alwaysOpenFile                 | bool   |          | -       |      |
 | time_before_close              | time_before_close              | string |          | -       |      |
@@ -27,10 +34,25 @@ All values must be set in the global object.
 ### Examples
 ```json
 {
-	"path" : "/var/log/messages",
-	"index" : "linux",
-	"sourcetype" : "linux:messages"
+	"inputs":
+	[
+		{
+			"path" : "/var/log/messages",
+			"index" : "linux",
+			"sourcetype" : "linux:messages"
+		}
+	]
 }
+```
+
+```yaml
+inputs:
+  - path: "E:\\LOGS\\IIS"
+    index: "default_iis"
+    sourcetype: "ms:iis:splunk"
+    ignore_older_than: 1d
+    disabled: false
+    recursive: true
 ```
 
 ### References
