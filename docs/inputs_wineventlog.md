@@ -30,7 +30,7 @@
 | resolve_ad_obj            |                       | resolve_ad_obj |          |          |                                                |
 | filtering                 |                       | filtering      |          |          |                                                |
 
-### resolve_ad_obj object
+## resolve_ad_obj object
 | Name                     | SplunkName               | Type          | Required | Desc |
 |--------------------------|--------------------------|---------------|----------|------|
 | skip_GUIDs               | evt_skip_GUID_resolution | array[string] |          |      |
@@ -42,7 +42,7 @@
 | evt_ad_cache_exp_neg     | cache_exp_neg            | int           |          |      |
 | evt_ad_cache_max_entries | cache_max_entries        | int           |          |      |
 
-### suppress object
+## suppress object
 | Name       | SplunkName          | Type | Required | Desc |
 |------------|---------------------|------|----------|------|
 | checkpoint | suppress_checkpoint | bool |          |      |
@@ -53,7 +53,7 @@
 | opcode     | suppress_opcode     | bool |          |      |
 | text       | suppress_text       | bool |          |      |
 
-### filtering object
+## filtering object
 | Name       | SplunkName   | Type          | Required | Desc                          |
 |------------|--------------|---------------|----------|-------------------------------|
 | whitelist  | whitelist    | filter        |          |                               |
@@ -61,7 +61,7 @@
 | whitelists | whitelist1-9 | array[filter] |          | Numbered (!) Array of filters |
 | blacklists | blacklist1-9 | array[filter] |          | Numbered (!) Array of filters |
 
-#### filter object
+## filter object
 | Name  | Type       | Required | Desc                           |
 |-------|------------|----------|--------------------------------|
 | regex | string     | false*   | Regex to use as a filter       |
