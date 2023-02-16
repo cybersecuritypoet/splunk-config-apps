@@ -2,7 +2,6 @@ import json
 import jinja2
 import yaml
 import os
-import sys
 import argparse
 
 
@@ -121,7 +120,7 @@ def fix_app(app, group, globals):
 		else:
 			app["prefix"] = globals["prefix"]
 	if ("postfix" not in app.keys() or app["postfix"] == "" or str.isspace(app["postfix"])):
-		if not ("suffix" not in app.keys() or app["suffix"] == "" or str.issspace(app["suffix"])):
+		if not ("suffix" not in app.keys() or app["suffix"] == "" or str.isspace(app["suffix"])):
 			app["postfix"] = app["suffix"]
 		else:
 			if group is not None and "suffix" in group.keys() and group["suffix"] != "" and not str.isspace(group["suffix"]):
