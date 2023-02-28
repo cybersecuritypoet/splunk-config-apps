@@ -41,38 +41,45 @@ def generate_app(app, tpl_path, group_path, default_meta_template, quiet):
 							if not quiet:
 								print('+ Writing: '+os.path.join(dir_path,e))
 							f.write(content)
-	for root, dirs, files in os.walk(app_tpl_path):
-		for e in files:
-			file_path = os.path.join(root,e)
-			if os.path.isfile(file_path):
-				with open(file_path,"r") as tpl:
-					if not quiet:
-						print('. Rendering: '+file_path)
-					try:
-						j2template = jinja2.Environment(loader=jinja2.FileSystemLoader(tpl_path)).from_string(tpl.read())
-					except jinja2.exceptions.TemplateSyntaxError as ex:
+	if(os.path.isdir(app_tpl_path)):
+		for root, dirs, files in os.walk(app_tpl_path):
+			for e in files:
+				file_path = os.path.join(root,e)
+				if os.path.isfile(file_path):
+					with open(file_path,"r") as tpl:
 						if not quiet:
-							print("!  Template error : "+ex.message+" In file: "+file_path+" ; line: "+str(ex.lineno))
-							print("! Exiting (4).")
-						exit(4)
-					dir_path = os.path.join(app_out_path,os.path.relpath(root,app_tpl_path))
-					os.makedirs(dir_path,0o700,True)
-					with open(os.path.join(dir_path,e),"w") as f:
+							print('. Rendering: '+file_path)
 						try:
-							content = j2template.render(conf=app, undefined=jinja2.StrictUndefined)
-						except jinja2.exceptions.UndefinedError as ex:
+							j2template = jinja2.Environment(loader=jinja2.FileSystemLoader(tpl_path)).from_string(tpl.read())
+						except jinja2.exceptions.TemplateSyntaxError as ex:
 							if not quiet:
-								print('! Template error : '+ex.message+' In file: '+file_path)
-								print('! Exiting (5).')
-							exit(5)
-						except TypeError as ex:
+								print("!  Template error : "+ex.message+" In file: "+file_path+" ; line: "+str(ex.lineno))
+								print("! Exiting (4).")
+							exit(4)
+						dir_path = os.path.join(app_out_path,os.path.relpath(root,app_tpl_path))
+						os.makedirs(dir_path,0o700,True)
+						with open(os.path.join(dir_path,e),"w") as f:
+							try:
+								content = j2template.render(conf=app, undefined=jinja2.StrictUndefined)
+							except jinja2.exceptions.UndefinedError as ex:
+								if not quiet:
+									print('! Template error : '+ex.message+' In file: '+file_path)
+									print('! Exiting (5).')
+								exit(5)
+							except TypeError as ex:
+								if not quiet:
+									print('! Type error : '+str(ex.args)+' In file: '+file_path)
+									print('! Exiting (5).')
+								exit(5)
 							if not quiet:
-								print('! Type error : '+str(ex.args)+' In file: '+file_path)
-								print('! Exiting (5).')
-							exit(5)
-						if not quiet:
-							print('+ Writing: '+os.path.join(dir_path,e))
-						f.write(content)
+								print('+ Writing: '+os.path.join(dir_path,e))
+							f.write(content)
+	else:
+		if not quiet:
+			print("! Template missing: "+app["template"]+" for app: "+app["name"]+" in: "+group_path)
+			print('! Exiting (7).')
+		exit(6)
+
 def merge_obj(obj1, obj2):
 	new_obj = {}
 	new_obj.update(obj1)
