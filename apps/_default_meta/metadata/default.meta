@@ -2,7 +2,9 @@
 {%- for permission in conf.default_meta.permissions %}
 #### Object: '{{permission.object}}'
 [{{permission.object}}]
+	{% if permission.read is defined and permission.write is defined %}
 access	= read : [ {{permission.read|default("*",true)|join(", ")}} ], write : [ {{permission.write|join(", ")}} ]
+	{%-endif%}
 	{%- if permission.export_system is defined %}
 		{%- if permission.export_system %}
 export	= system
