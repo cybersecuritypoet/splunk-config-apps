@@ -122,7 +122,7 @@ def fix_group(group, globals):
 
 def fix_app(app, group, globals):
 	if ( ("skip_default_meta" not in app.keys() or not app["skip_default_meta"]) and not "default_meta" in app.keys() ):
-		if "default_meta" in group.keys():
+		if group is not None and "default_meta" in group.keys():
 			app["default_meta"] = group["default_meta"]
 		elif "default_meta" in globals.keys():
 			app["default_meta"] = globals["default_meta"]
