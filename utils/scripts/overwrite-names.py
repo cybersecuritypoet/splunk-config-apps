@@ -3,6 +3,7 @@ import jinja2
 import yaml
 import os
 import argparse
+import re
 
 def load_vars(vars_file,quiet=False):
     with open(vars_file) as f:
@@ -29,15 +30,17 @@ def load_vars(vars_file,quiet=False):
             exit(23)
         return obj
 
-def render_data(apps_path,vars,quiet=False,list=False):
+def render_data(apps_path,vars,path_regex=None,quiet=False,list=False):
     if not quiet:
         print ("Vars: "+str(vars))
     for root, dirs, files in os.walk(apps_path):
         for e in files:
             file_path = os.path.join(root,e)
-            if os.path.isfile(file_path):
+            if os.path.isfile(file_path) and (path_regex == None or path_regex.match(file_path)):
                 orig_content=None
                 with open(file_path,"r") as file:
+                    if not quiet:
+                        print('+ Reading: '+file_path)
                     orig_content = file.read()
                     try:
                         j2template = jinja2.Environment(loader=jinja2.FileSystemLoader(file_path)).from_string(orig_content)
@@ -73,11 +76,13 @@ def main():
     vars_file = ""
     quiet = False
     list = False
+    path_regex = None
 
     argparser = argparse.ArgumentParser(description = "Generates PKI install scripts")
 
     argparser.add_argument( "apps", help = "Applications Path")
     argparser.add_argument( "vars", help = "Variables file")
+    argparser.add_argument( "-f", "--filter", nargs='?', help = "Filter processed files using")
     argparser.add_argument("-q", "--quiet", action='store_true', help="Quiet output")
     argparser.add_argument("-l", "--list", action='store_true', help="List modified files")
     args = argparser.parse_args()
@@ -90,6 +95,8 @@ def main():
         vars_file = args.vars
     if args.list:
         list = True
+    if args.filter is not None:
+        path_regex = re.compile(args.filter)
         
     if(not os.path.exists(apps_path)):
         print("No such directory: "+apps_path)
@@ -99,6 +106,6 @@ def main():
         exit(2)
         
     vars = load_vars(vars_file,quiet)
-    render_data(apps_path,vars,quiet,list)
+    render_data(apps_path,vars,path_regex,quiet,list)
 
 main()
