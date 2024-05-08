@@ -2,7 +2,6 @@ import json
 import jinja2
 import yaml
 import os
-import sys
 import argparse
 
 def load_vars(vars_file,quiet=False):
@@ -30,16 +29,18 @@ def load_vars(vars_file,quiet=False):
             exit(23)
         return obj
 
-def render_data(apps_path,vars,quiet=False):
+def render_data(apps_path,vars,quiet=False,list=False):
     if not quiet:
         print ("Vars: "+str(vars))
     for root, dirs, files in os.walk(apps_path):
         for e in files:
             file_path = os.path.join(root,e)
             if os.path.isfile(file_path):
+                orig_content=None
                 with open(file_path,"r") as file:
+                    orig_content = file.read()
                     try:
-                        j2template = jinja2.Environment(loader=jinja2.FileSystemLoader(file_path)).from_string(file.read())
+                        j2template = jinja2.Environment(loader=jinja2.FileSystemLoader(file_path)).from_string(orig_content)
                     except jinja2.exceptions.TemplateSyntaxError as ex:
                         if not quiet:
                             print("!  Template error : "+ex.message+" In file: "+file_path+" ; line: "+str(ex.lineno))
@@ -58,22 +59,27 @@ def render_data(apps_path,vars,quiet=False):
                             print('! Exiting (5).')
                         exit(5)
                     file.close()
-                with open(file_path,"w") as file:
-                    if not quiet:
-                        print('+ Writing: '+file_path)
-                    file.write(content)
-                    file.close()
+                if ( orig_content != None and orig_content != content):
+                        with open(file_path,"w") as file:
+                                if not quiet:
+                                        print('+ Writing: '+file_path)
+                                if list:
+                                        print(file_path)
+                                file.write(content)
+                                file.close()
 def main():
 
     apps_path = ""
     vars_file = ""
     quiet = False
+    list = False
 
     argparser = argparse.ArgumentParser(description = "Generates PKI install scripts")
 
     argparser.add_argument( "apps", help = "Applications Path")
     argparser.add_argument( "vars", help = "Variables file")
     argparser.add_argument("-q", "--quiet", action='store_true', help="Quiet output")
+    argparser.add_argument("-l", "--list", action='store_true', help="List modified files")
     args = argparser.parse_args()
 
     if args.quiet:
@@ -82,6 +88,8 @@ def main():
         apps_path = args.apps
     if args.vars:
         vars_file = args.vars
+    if args.list:
+        list = True
         
     if(not os.path.exists(apps_path)):
         print("No such directory: "+apps_path)
@@ -91,6 +99,6 @@ def main():
         exit(2)
         
     vars = load_vars(vars_file,quiet)
-    render_data(apps_path,vars,quiet)
+    render_data(apps_path,vars,quiet,list)
 
 main()

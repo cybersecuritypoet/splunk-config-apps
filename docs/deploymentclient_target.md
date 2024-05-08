@@ -14,7 +14,7 @@ All settings in this section will be placed in [deployment-client] stanza
 |connect_timeout|connect_timeout|uint|-|The amount of time, in seconds, that a deployment client can take to connect to a deployment server before the server connection times out|
 |send_timeout|send_timeout|uint|-|The amount of time, in seconds, that a deployment client can take to send or write data to a deployment server before the server connection times out|
 |recv_timeout|recv_timeout|uint|-|he amount of time, in seconds, that a deployment client can take to receive or read data from a deployment server before the server connection times out|
-|target||SSL|-|SSL configuration|
+|ssl||SSL|-|SSL configuration|
 |target||target|-|Target definition|
 
 ### Object: SSL

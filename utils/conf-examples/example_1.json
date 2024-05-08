@@ -139,7 +139,7 @@
 					]
 				},
 				{
-					"template" : "server_indexer_replication_ssl",
+					"template" : "server_replication_port_ssl",
 					"SSL" : {},
 					"replication_ports_ssl" :
 					[
@@ -150,7 +150,7 @@
 					]
 				},
 				{
-					"template" : "server_indexer_replication_ssl_client_san_check",
+					"template" : "server_replication_port_ssl_san",
 					"replication_ports_ssl" :
 					[
 						{
